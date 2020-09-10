@@ -3,16 +3,17 @@ const handlebars = require('express-handlebars')
 const db = require('./models')
 const app = express()
 const bodyParser = require('body-parser') 
-const port = 3000
 const flash = require('connect-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
 const passport = require('./config/passport')
+const port = process.env.PORT || 3000
 
 
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
 app.use(bodyParser.urlencoded({extended: true}))
+
 app.use(session({ 
     secret: 'secret', 
     resave: false, 
