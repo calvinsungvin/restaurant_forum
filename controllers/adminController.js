@@ -9,14 +9,13 @@ const IMGUR_CLIENT_ID = 'e7b642f2d94bb82'
 let adminController = {
     getRestaurants: (req, res) => {
         return Restaurant.findAll({raw: true}).then(restaurants => {
-            return res.render('admin/restaurants', {
+            return res.render('/admin/restaurants', {
                 restaurants: restaurants
             })
-
         })
     },
     createRestaurant: (req, res) => {
-        return res.render('admin/create')
+        return res.render('/admin/create')
     },
     postRestaurant: (req, res) => {
       if(!req.body.name){
@@ -57,14 +56,14 @@ let adminController = {
     },
     getRestaurant: (req, res) => {
         return Restaurant.findByPk(req.params.id, {raw:true}).then(restaurant => {
-          return res.render('admin/restaurant', {
+          return res.render('/admin/restaurant', {
             restaurant: restaurant
           })
         })
       },
     editRestaurant: (req, res) => {
         return Restaurant.findByPk(req.params.id, {raw: true}).then(restaurant => {
-            return res.render('admin/create', { restaurant: restaurant })
+            return res.render('/admin/create', { restaurant: restaurant })
         })
     },
     putRestaurant: (req, res) => {
@@ -122,20 +121,25 @@ let adminController = {
             })
     }, 
     getUsers: (req, res) => {
-      return User.findAll({ raw: true }).then(users => {
-          return res.render('admin/users', { users: users })
+      return User.findAll({ raw: true })
+      .then(users => {
+          return res.render('admin/users', { users })
       })
+      .catch(err => console.log(err))
   },
-    putUsers: (req, res) => {
-      return User.findByPk(req.params.id)
-        .then(user => {
-          user.update({ isAdmin: user.isAdmin? false: true })
-            .then(user => {
-              req.flash('success_messages', 'user is now updated!')
-              res.redirect('/admin/users')
-            })
-        })
-    }
+  putUsers: (req, res) => {
+    return User.findByPk(req.params.id)
+      .then(user => {
+        const isAdmin = !user.isAdmin  
+        user.update({ isAdmin })
+          .then(() => {
+            req.flash('success_messages','User authority was successfully updated')
+            return res.redirect('back')
+          } )
+          .catch(err => console.log(err))
+      })
+      .catch(err => console.log(err))
+  },
 }
 
 module.exports = adminController

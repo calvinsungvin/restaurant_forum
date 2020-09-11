@@ -9,7 +9,6 @@ const methodOverride = require('method-override')
 const passport = require('./config/passport')
 const port = process.env.PORT || 3000
 
-
 app.engine('handlebars', handlebars({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
 app.use(bodyParser.urlencoded({extended: true}))
