@@ -3,6 +3,7 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
+const Favorite = db.Favorite
 
 const pageLimit = 10
 
@@ -106,6 +107,25 @@ let restController = {
                         restaurant: restaurant.toJSON()
                     })
                 })
+        })
+    },
+    getTopRestaurant: (req, res) => {
+        return Restaurant.findAll({
+            include: [
+                { model: User, as: 'FavoritedUsers'}
+            ]
+        }).then(restaurants => {
+            restaurants = restaurants.map(restaurant => ({
+                ...restaurant.dataValues,
+                description: restaurant.description.substring(0, 50),
+                isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
+                FavoriteCount: restaurant.FavoritedUsers.length
+            }))
+            restaurants = restaurants.sort((a, b) => b.FavoriteCount - a.FavoriteCount).slice(0, 10)
+            console.log(restaurants[0])
+            return res.render('topRestaurants', {
+                restaurants
+            })
         })
     }
 }
