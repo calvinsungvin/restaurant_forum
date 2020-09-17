@@ -113,7 +113,7 @@ let restController = {
         return Restaurant.findAll({
             include: [
                 { model: User, as: 'FavoritedUsers'}
-            ]
+            ],
         }).then(restaurants => {
             restaurants = restaurants.map(restaurant => ({
                 ...restaurant.dataValues,

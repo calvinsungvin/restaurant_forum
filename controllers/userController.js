@@ -8,7 +8,7 @@ const Like = db.Like
 const Followship = db.Followship
 const Restaurant = db.Restaurant
 const imgur = require('imgur-node-api')
-const IMGUR_CLIENT_ID = 'e7b642f2d94bb82'
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 
 const userController = {
