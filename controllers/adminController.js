@@ -52,7 +52,6 @@ let adminController = {
         })
       })
     },
-
     putRestaurant: (req, res) => {
     adminService.postRestaurant(req, res, (data) => {
      if(data.status === 'error'){
