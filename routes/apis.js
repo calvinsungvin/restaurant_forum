@@ -4,7 +4,7 @@ const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
 const passport = require('../config/passport')
 
-
+const restController = require('../controllers/api/restController.js')
 const adminController = require('../controllers/api/adminController.js')
 const categoryController = require('../controllers/api/categoryController.js')
 const userController = require('../controllers/api/userController.js')
@@ -19,6 +19,10 @@ const authenticatedAdmin = (req, res, next) => {
       return res.json({ status: 'error', message: 'permission denied' })
     }
   }
+
+router.get('/', authenticated, (req, res) => res.redirect('/api/restaurants'))
+router.get('/restaurants', authenticated, restController.getRestaurants)
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 
 router.get('/admin', authenticated, authenticatedAdmin, (req, res) => res.redirect('/api/admin/restaurants'))
 router.get('/admin/restaurants', authenticated, authenticatedAdmin, adminController.getRestaurants)
