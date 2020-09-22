@@ -100,6 +100,27 @@ const userService = {
               return callback({ status: 'success', message: '' })
             })
         })
+      },
+      addFollowing: (req, res, callback) => {
+          return Followship.create({
+            followerId: req.user.id,
+            followingId: req.params.userId
+          }).then(followship => {
+            return callback({ status: 'success', message: '' })
+          })
+      },
+      removeFollowing: (req, res, callback) => {
+          return Followship.findOne({
+              where: {
+                followerId: req.user.id,
+                followingId: req.params.userId
+              }
+          }).then(followship => {
+              followship.destroy()
+                .then(followship => {
+                    return callback({ status: 'success', message: '' })
+                })
+          })
       }
 }
 
