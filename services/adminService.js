@@ -106,6 +106,26 @@ let adminService = {
           }).catch(error => res.sendStatus(404))
         }).catch(error => res.sendStatus(404))
     }
+  },
+  getUsers: (req, res, callback) => {
+    return User.findAll()
+      .then(users => {
+        callback({ users: users})
+      })
+  },
+  putUsers: (req, res, callback) => {
+    return User.findByPk(req.params.id)
+      .then((user) => {
+        user.update({
+          isAdmin: req.body.isAdmin === 'true'
+        })
+          .then((restaurant) => {
+            callback({
+              status: 'success',
+              message: 'user updated successfully'
+            })
+          })
+      })
   }
 }
 

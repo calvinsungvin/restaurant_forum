@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
   }
-  const passport = require('./config/passport')
+const passport = require('./config/passport')
 
 
 app.engine('handlebars', handlebars({ 
