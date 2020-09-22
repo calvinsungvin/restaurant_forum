@@ -69,6 +69,60 @@ const restService = {
               })
             })
         })
+      },
+      getFeeds: (req, res, callback) => {
+          return Restaurant.findAll({
+            limit: 10,
+            raw: true,
+            nest: true,
+            order: [['createdAt', 'DESC']],
+            include: [Category]
+          }).then(restaurants => {
+              Comment.findAll({
+                limit: 10,
+                raw: true,
+                nest: true,
+                order: [['createdAt', 'DESC']],
+                include: [User, Restaurant]
+              }).then(comments => {
+                  callback({
+                    restaurants: restaurants,
+                    comments: comments
+                  })
+              })
+          })
+      },
+      getDashboard: (req, res, callback) => {
+          return Restaurant.findByPk(req.params.id, {
+              include: [
+                  Category,
+                  { model: Comment, include: [User]}
+              ]
+          }).then(restaurant => {
+              return callback({ restaurant:restaurant })
+          })
+      },
+      getTopRestaurants: (req, res, callback) => {
+        return Restaurant.findAll({
+          include: [
+            { model: User, as: 'FavoritedUsers' }
+          ]
+        }).then(restaurants => {
+          restaurants = restaurants.map(d => (
+            {
+              ...d.dataValues,
+            //   description: d.description.substring(0, 50),
+              isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(d.id),
+              FavoriteCount: d.FavoritedUsers.length
+            }
+          ))
+          restaurants = restaurants.sort((a, b) => a.FavoriteCount < b.FavoriteCount ? 1 : -1).slice(0, 10)
+    
+          return callback({
+            restaurants: restaurants,
+            // isAuthenticated: req.isAuthenticated
+          })
+        })
       }
 }
 
