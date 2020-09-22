@@ -9,6 +9,8 @@ const Followship = db.Followship
 const Restaurant = db.Restaurant
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+const userService = require('../services/userService.js')
+
 
 
 const userController = {
@@ -53,18 +55,8 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res) => {
-    return User.findByPk(req.user.id, {
-        include: [
-            Comment,
-            { model: Comment, include: [Restaurant] },
-            { model: Restaurant, as: 'FavoritedRestaurants' },
-            { model: User, as: 'Followers' },
-            { model: User, as: 'Followings' }
-        ]
-    }).then(user => {
-        const isFollowed = req.user.Followings.map(d => d.id).includes(user.id)
-        const userId = req.user.id
-        return res.render('userProfile', { user: user.toJSON(), isFollowed, userId })
+    userService.getUser(req, res, (data) => {
+      return res.render('users/profile', data)
     })
 },
   editUser: (req, res) => {
@@ -75,38 +67,12 @@ const userController = {
     res.render('editProfile')
   },
   putUser: (req, res) => {
-    if (!req.body.name) {
-      req.flash('error_messages', 'name did not exist')
-      return res.reditect('back')
-    }
-
-    const { file } = req
-    if (file) {
-      imgur.setClientID(IMGUR_CLIENT_ID)
-      imgur.upload(file.path, (err, img) => {
-        return User.findByPk(req.params.id)
-          .then(user => {
-            user.update({
-              name: req.body.name,
-              image: file ? img.data.link : null
-            }).then(user => {
-              req.flash('success_messages', 'user info is now updated!')
-              res.redirect(`/users/${user.id}`)
-            })
-          })
-      })
-    } else {
-      return User.findByPk(req.params.id)
-        .then(user => {
-          user.update({
-            name: req.body.name,
-            image: user.image
-          }).then(user => {
-            req.flash('success_messages', 'user info is now updated!')
-            res.redirect(`/users/${user.id}`)
-          })
-        })
-    }
+    userService.putUser(req, res, (data) => {
+      if (data['status'] === 'success') {
+        req.flash('success_messages', data['message'])
+      }
+      return res.redirect(`/users/${req.params.id}`)
+    })
   },
   addFavorite: (req, res) => {
     return Favorite.create({
